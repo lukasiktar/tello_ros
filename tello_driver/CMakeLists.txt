@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.14)
 project(tello_driver)
 
 #=============
@@ -13,16 +13,6 @@ endif ()
 # Default to C++14
 if (NOT CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD 14)
-endif ()
-
-# Emulate colcon
-if ($ENV{CLION_IDE})
-  message(STATUS "Running inside CLion")
-  set(tello_msgs_DIR "${PROJECT_SOURCE_DIR}/../../../install/tello_msgs/share/tello_msgs/cmake")
-  set(ros2_shared_DIR "${PROJECT_SOURCE_DIR}/../../../install/ros2_shared/share/ros2_shared/cmake")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DRUN_INSIDE_CLION")
-  set(FastRTPS_INCLUDE_DIR "/opt/ros/foxy/include")
-  set(FastRTPS_LIBRARY_RELEASE "/opt/ros/foxy/lib/libfastrtps.so")
 endif ()
 
 # Asio requires threading
@@ -41,9 +31,12 @@ find_package(ros2_shared REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(tello_msgs REQUIRED)
+find_package(std_srvs REQUIRED)
+
 
 # Package includes not needed for CMake >= 2.8.11
 include_directories(
+  ${std_srvs_INCLUDE_DIRS}
   include
   h264decoder)
 
@@ -72,6 +65,7 @@ set(DRIVER_NODE_DEPS
   geometry_msgs
   OpenCV
   rclcpp
+  rclcpp_components
   ros2_shared
   sensor_msgs
   std_msgs
@@ -126,7 +120,9 @@ set(JOY_NODE_DEPS
   class_loader
   geometry_msgs
   rclcpp
+  rclcpp_components
   sensor_msgs
+  std_srvs
   tello_msgs)
 
 add_library(tello_joy_node SHARED
